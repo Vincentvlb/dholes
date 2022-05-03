@@ -1,8 +1,1 @@
-numpy==1.22.3
-opencv-python==4.5.5.64
-picamera==1.13
-Pillow==9.0.1
 PyAudio==0.2.11
-scikit-video==1.1.11
-scipy==1.8.0
-sk-video==1.1.10
