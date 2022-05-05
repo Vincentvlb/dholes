@@ -26,6 +26,8 @@ class WebServer:
 
     def index(self):
         files = glob(f"{self.__upload_folder}/*.mpeg")
+        files.sort(key=os.path.getmtime)
+        files.reverse()
         return render_template("index.html", files=files, threshold=self.__get_threshold())
 
     def set_threshold(self):
