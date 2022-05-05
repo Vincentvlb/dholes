@@ -13,8 +13,15 @@ def get_logitech_720p_mic_id() -> int:
 
 def get_logitech_4k_video_path() -> Path:
     regex = r"Logitech BRIO.*\n *(.*)"
-    match = re.search(regex, subprocess.check_output(['v4l2-ctl', '--list-devices']).decode("utf-8"), re.MULTILINE)
+    try:
+        match = re.search(regex, subprocess.check_output(['v4l2-ctl', '--list-devices']).decode("utf-8"), re.MULTILINE)
+    except:
+        print("Not found Logitech BRIO camera !")
+        exit(1)
     return Path("".join(match.groups()[0].split()))
+
+def run_file_web_werver(record_path: Path) -> subprocess.Popen:
+    return subprocess.Popen(["python3", "-m", "http.server"], cwd=record_path)
 
 def test_detector():
     print("bip")
