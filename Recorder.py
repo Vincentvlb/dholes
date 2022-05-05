@@ -29,7 +29,7 @@ class Recorder():
 class SimpleVideoRecorder(Recorder):
 
     def __init__(self, second_recording_time: int, source: Path, directory: Path, filename: str, framerate: int, width: int, height: int):
-        super().__init__(second_recording_time, source, directory, filename, "avi")
+        super().__init__(second_recording_time, source, directory, filename, "mpeg")
         self.__framerate = framerate
         self.__width = width
         self.__height = height

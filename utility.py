@@ -20,8 +20,5 @@ def get_logitech_4k_video_path() -> Path:
         exit(1)
     return Path("".join(match.groups()[0].split()))
 
-def run_file_web_werver(record_path: Path) -> subprocess.Popen:
-    return subprocess.Popen(["python3", "-m", "http.server"], cwd=record_path)
-
 def test_detector():
     print("bip")

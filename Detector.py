@@ -27,7 +27,7 @@ class Detector():
 
 class AudioDetector(Detector):
 
-    def __init__(self, fct_on_detection, input_device_index):
+    def __init__(self, fct_on_detection: Callable, input_device_index):
         super().__init__(fct_on_detection)
         self.__audio = pyaudio.PyAudio() 
         self.__audio_format = pyaudio.paInt16
@@ -61,6 +61,9 @@ class AudioDetector(Detector):
 
     def set_detection_threshold(self, detection_threshold: float):
         self.__detection_threshold = detection_threshold
+
+    def get_detection_threshold(self):
+        return f'{self.__detection_threshold:.2f}'
 
     def _running_method(self):
         while self.is_working:

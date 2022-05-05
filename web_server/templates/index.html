@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dholes</title>
+    </head>
+    <body>
+        <h1>Dholes project</h1>
+        <h2>Settings : </h2>
+        <p>Current threshold : 
+            <form action="/set_threshold" method="POST">
+                <input name="threshold" style="width: 50px;" type="number" value="{{ threshold }}" step="0.01">
+            </form>
+        </p>
+        <h2>Download files : </h2>
+        <ul>
+        {% for file in files %}
+            <li><a href="/{{ file }}">{{ file | replace("videos/","") }}</a></li>
+        {% endfor %}
+        </ul>
+        <script src="{{ url_for('static' , filename='js/jquery.js') }}" ></script>
+        <script>
+            $('form input').on('change', function() {
+                $(this).closest('form').submit();
+            });
+        </script>
+    </body>
+</html>
