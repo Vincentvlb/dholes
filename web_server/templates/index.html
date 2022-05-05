@@ -8,7 +8,7 @@
         <h2>Settings : </h2>
         <p>Current threshold : 
             <form action="/set_threshold" method="POST">
-                <input name="threshold" style="width: 50px;" type="number" value="{{ threshold }}" step="0.01">
+                <input name="threshold" style="width: 50px;" type="number" value="{{ threshold }}" step="0.01" pattern="[0-9]+">
             </form>
         </p>
         <h2>Download files : </h2>

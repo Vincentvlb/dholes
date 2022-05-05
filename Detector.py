@@ -3,13 +3,16 @@ import pyaudio
 import struct
 import math
 from typing import Callable
+import multiprocessing
 
 class Detector():
 
     def __init__(self, fct_on_detection: Callable):
         self.__working = False
         self._fct_on_detection = fct_on_detection
-        self._thread = threading.Thread(target=self._running_method)
+        ctx = multiprocessing.get_context('spawn')
+        self._queue = ctx.Queue()
+        self._thread = threading.Thread(target=self._running_method, args=(self._queue,))
 
     def start_detection(self):
         self.__working = True
@@ -22,7 +25,7 @@ class Detector():
     def is_working(self) -> bool:
         return self.__working
 
-    def _running_method(self):
+    def _running_method(self, queue: multiprocessing.Queue):
         raise NotImplementedError("Subclass must implement abstract method")
 
 class AudioDetector(Detector):
@@ -37,6 +40,7 @@ class AudioDetector(Detector):
         self.__samp_rate = int(self.__audio.get_device_info_by_index(self.__input_device_index).get('defaultSampleRate'))
         self.__detection_threshold = None
         self.__short_normalize = (1.0/32768.0)
+        
 
     def __get_rms(self, block):
         count = len(block)/2
@@ -59,14 +63,20 @@ class AudioDetector(Detector):
                                             input = True)
         super().start_detection()
 
-    def set_detection_threshold(self, detection_threshold: float):
+    def set_threshold(self, detection_threshold: float):
         self.__detection_threshold = detection_threshold
+        self._queue.put(detection_threshold)
 
-    def get_detection_threshold(self):
+    def get_formatted_threshold(self):
         return f'{self.__detection_threshold:.2f}'
 
-    def _running_method(self):
-        while self.is_working:
+    def _running_method(self, queue: multiprocessing.Queue):
+        detection_threshold = queue.get()
+        while self.is_working():
+            if not queue.empty():
+                detection_threshold = queue.get()
+                print("new_threshold:",detection_threshold)
             data = self.__stream.read(2048, exception_on_overflow = False)
-            if self.__get_rms(data) > self.__detection_threshold:
+            if self.__get_rms(data) > detection_threshold:
                 self._fct_on_detection()
+            
