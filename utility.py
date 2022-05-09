@@ -7,8 +7,16 @@ import re
 def get_logitech_720p_mic_id() -> int:
     p = pyaudio.PyAudio()
     for mic_id in range(p.get_device_count()):
-        if p.get_device_info_by_index(mic_id).get('name') == "USB Device 0x46d:0x825: Audio (hw:2,0)":
+        if "USB Device 0x46d:0x825" in p.get_device_info_by_index(mic_id).get('name'):
             return mic_id
+    return None
+
+def get_logitech_4k_mic_path() -> Path:
+    p = pyaudio.PyAudio()
+    for mic_id in range(p.get_device_count()):
+        name = p.get_device_info_by_index(mic_id).get('name')
+        if "Logitech BRIO: USB Audio" in name:
+            return Path(name.split("(")[1][:-1])
     return None
 
 def get_logitech_4k_video_path() -> Path:

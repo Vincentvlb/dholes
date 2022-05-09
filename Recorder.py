@@ -36,3 +36,15 @@ class SimpleVideoRecorder(Recorder):
 
     def run_record(self) -> bool:
         subprocess.run(f"ffmpeg -f v4l2 -r {self.__framerate} -s {self.__width}x{self.__height} -t {self._second_recording_time} -i {self._source} {self._directory}/{self._get_formatted_filename()}.{self._file_extension} -y", shell=True, check=True)
+        
+class VideoAudioRecorder(Recorder):
+
+    def __init__(self, second_recording_time: int, source: Path, directory: Path, filename: str, framerate: int, width: int, height: int, sound_source: Path):
+        super().__init__(second_recording_time, source, directory, filename, "mpeg")
+        self.__framerate = framerate
+        self.__width = width
+        self.__height = height
+        self.__sound_source = sound_source
+
+    def run_record(self) -> bool:     
+        subprocess.run(f"ffmpeg -f v4l2 -r {self.__framerate} -s {self.__width}x{self.__height} -i {self._source} -f alsa -i {self.__sound_source} -ac 2 -map 0:v -map 1:a -preset ultrafast -crf 14 -t {self._second_recording_time} -y {self._directory}/{self._get_formatted_filename()}.{self._file_extension}", shell=True, check=True)
