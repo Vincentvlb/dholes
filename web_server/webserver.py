@@ -15,6 +15,7 @@ class WebServer:
 
         self.__app.add_url_rule('/', view_func=self.index)
         self.__app.add_url_rule('/videos/<filename>', view_func=self.videos)
+        self.__app.add_url_rule('/remove_file', view_func=self.remove_file, methods=["POST"])
         self.__app.add_url_rule('/set_threshold', view_func=self.set_threshold, methods=["POST"])
         
         """logging.getLogger('werkzeug').disabled = True
@@ -32,8 +33,16 @@ class WebServer:
 
     def set_threshold(self):
         threshold = request.form.get("threshold")
-        self.__set_threshold(float(threshold))
-        return ('', 204)
+        new_threshold = self.__set_threshold(float(threshold))
+        return jsonify(threshold=new_threshold)
 
     def videos(self, filename):
         return send_from_directory(directory=self.__upload_folder, path=filename)
+
+    def remove_file(self):
+        filename = request.form.get("filename")
+        if os.path.exists(f"videos/{filename}"):
+            os.remove(f"videos/{filename}")
+            return jsonify(True)
+        else:
+            return jsonify(False)

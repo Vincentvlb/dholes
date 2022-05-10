@@ -1,0 +1,13 @@
+#current_threshold{
+    padding: 2px 4px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+li * {
+    vertical-align:middle;
+}
+
+li{
+    padding-left: 5px;
+}

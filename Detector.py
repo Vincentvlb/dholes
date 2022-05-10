@@ -50,7 +50,7 @@ class AudioDetector(Detector):
         for sample in shorts:
             n = sample * self.__short_normalize
             sum_squares += n*n
-        return math.sqrt(sum_squares/count)*10
+        return math.sqrt(sum_squares/count)*1000
 
     def start_detection(self):
         if self.__detection_threshold is None:
@@ -66,9 +66,12 @@ class AudioDetector(Detector):
     def set_threshold(self, detection_threshold: float):
         self.__detection_threshold = detection_threshold
         self._queue.put(detection_threshold)
+        while not self._queue.empty():
+            continue
+        return f'{self.__detection_threshold:.0f}'
 
     def get_formatted_threshold(self):
-        return f'{self.__detection_threshold:.2f}'
+        return f'{self.__detection_threshold:.0f}'
 
     def _running_method(self, queue: multiprocessing.Queue):
         detection_threshold = queue.get()
