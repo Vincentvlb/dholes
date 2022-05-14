@@ -13,6 +13,12 @@
                 <button id="btn_submit" submit >Enregister</button>
             </form>
         </p>
+        <p>Temps d'enregistrement : <span id="current_recording_time">{{ recording_time }}</span>
+            <form id="recording_time_form" action="/set_recording_time" method="POST">
+                <input name="recording_time" style="width: 40px;" type="number" value="{{ recording_time }}" step="1" pattern="[0-9]+">
+                <button id="btn_submit" submit >Enregister</button>
+            </form>
+        </p>
         <h2>Téléchargement des fichiers : </h2>
         <ul>
         {% for file in files %}

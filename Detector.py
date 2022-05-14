@@ -3,16 +3,14 @@ import pyaudio
 import struct
 import math
 from typing import Callable
-import multiprocessing
+from multiprocessing import Value
 
 class Detector():
 
     def __init__(self, fct_on_detection: Callable):
         self.__working = False
         self._fct_on_detection = fct_on_detection
-        ctx = multiprocessing.get_context('spawn')
-        self._queue = ctx.Queue()
-        self._thread = threading.Thread(target=self._running_method, args=(self._queue,))
+        self._thread = threading.Thread(target=self._running_method)
 
     def start_detection(self):
         self.__working = True
@@ -25,7 +23,7 @@ class Detector():
     def is_working(self) -> bool:
         return self.__working
 
-    def _running_method(self, queue: multiprocessing.Queue):
+    def _running_method(self):
         raise NotImplementedError("Subclass must implement abstract method")
 
 class AudioDetector(Detector):
@@ -38,7 +36,7 @@ class AudioDetector(Detector):
         self.__channels = 1
         self.__frames_per_buffer = 4096
         self.__samp_rate = int(self.__audio.get_device_info_by_index(self.__input_device_index).get('defaultSampleRate'))
-        self.__detection_threshold = None
+        self.__detection_threshold = Value('f',0.0)
         self.__short_normalize = (1.0/32768.0)
         
 
@@ -53,7 +51,7 @@ class AudioDetector(Detector):
         return math.sqrt(sum_squares/count)*100
 
     def start_detection(self):
-        if self.__detection_threshold is None:
+        if self.__get_threshold() is None:
             raise Exception("Couldn't start detection because detection threshold isn't define.")
         self.__stream = self.__audio.open(  format = self.__audio_format, \
                                             rate = self.__samp_rate, \
@@ -64,23 +62,19 @@ class AudioDetector(Detector):
         super().start_detection()
 
     def set_threshold(self, detection_threshold: float):
-        self.__detection_threshold = detection_threshold
-        self._queue.put(detection_threshold)
-        while not self._queue.empty():
-            continue
-        return f'{self.__detection_threshold:.0f}'
+        self.__detection_threshold.value = float(detection_threshold)
+        return self.get_formatted_threshold()
 
     def get_formatted_threshold(self):
-        return f'{self.__detection_threshold:.0f}'
+        return f'{self.__get_threshold():.0f}'
 
-    def _running_method(self, queue: multiprocessing.Queue):
-        detection_threshold = queue.get()
+    def __get_threshold(self):
+        return self.__detection_threshold.value
+
+    def _running_method(self):
         while self.is_working():
-            if not queue.empty():
-                detection_threshold = queue.get()
-                print("new_threshold:",detection_threshold)
             data = self.__stream.read(4096, exception_on_overflow = False)
             rms = self.__get_rms(data)
-            if  rms > detection_threshold:
+            if  rms > self.__get_threshold():
                 self._fct_on_detection()
             
