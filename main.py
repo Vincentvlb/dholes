@@ -4,9 +4,6 @@ from web_server import webserver
 from pathlib import Path
 import utility
 
-def bip():
-    print("bip")
-
 def main():
     record_path = Path("./videos")
     #simpleVideoRecorder = SimpleVideoRecorder(5, utility.get_logitech_4k_video_path(), record_path, "record_$day-$month-$year_$hour-$min-$sec", 25, 1920, 1080)
