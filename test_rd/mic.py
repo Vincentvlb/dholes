@@ -4,7 +4,15 @@ import struct
 import math
 import time
 
-dev_index = 1
+def get_mic_id() -> int:
+    p = pyaudio.PyAudio()
+    for mic_id in range(p.get_device_count()):
+        if "USB Audio Device" in p.get_device_info_by_index(mic_id).get('name'):
+            return mic_id
+    return None
+
+print(get_mic_id())
+dev_index = 0
 channels = 1
 format = pyaudio.paInt16
 SHORT_NORMALIZE = (1.0/32768.0)
@@ -14,7 +22,7 @@ audio = pyaudio.PyAudio()
 
 samp_rate = int(audio.get_device_info_by_index(dev_index).get('defaultSampleRate'))
 
-stream = audio.open(format = format,rate = samp_rate,channels = channels, input_device_index = dev_index,input = True, frames_per_buffer=2048)
+stream = audio.open(format = format,rate = samp_rate,channels = channels, input_device_index = dev_index,input = True, frames_per_buffer=1024)
 frames = []
 
 def get_rms( block ):
@@ -45,7 +53,7 @@ try:
     cpt=0
     start_time = time.time();
     while True:
-        data = stream.read(2048)
+        data = stream.read(2048, exception_on_overflow = False)
         frames.append(data)
         file.write(f"{time.time()-start_time};{get_rms(data)} \n")
         cpt+=1

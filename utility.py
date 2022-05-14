@@ -11,6 +11,13 @@ def get_logitech_720p_mic_id() -> int:
             return mic_id
     return None
 
+def get_mic_adapter_id() -> int:
+    p = pyaudio.PyAudio()
+    for mic_id in range(p.get_device_count()):
+        if "C-Media USB Headphone Set" in p.get_device_info_by_index(mic_id).get('name'):
+            return mic_id
+    return None
+
 def get_logitech_4k_mic_path() -> Path:
     p = pyaudio.PyAudio()
     for mic_id in range(p.get_device_count()):

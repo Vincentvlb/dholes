@@ -36,7 +36,7 @@ class AudioDetector(Detector):
         self.__audio_format = pyaudio.paInt16
         self.__input_device_index = input_device_index
         self.__channels = 1
-        self.__frames_per_buffer = 2048
+        self.__frames_per_buffer = 4096
         self.__samp_rate = int(self.__audio.get_device_info_by_index(self.__input_device_index).get('defaultSampleRate'))
         self.__detection_threshold = None
         self.__short_normalize = (1.0/32768.0)
@@ -50,7 +50,7 @@ class AudioDetector(Detector):
         for sample in shorts:
             n = sample * self.__short_normalize
             sum_squares += n*n
-        return math.sqrt(sum_squares/count)*1000
+        return math.sqrt(sum_squares/count)*100
 
     def start_detection(self):
         if self.__detection_threshold is None:
@@ -79,7 +79,8 @@ class AudioDetector(Detector):
             if not queue.empty():
                 detection_threshold = queue.get()
                 print("new_threshold:",detection_threshold)
-            data = self.__stream.read(2048, exception_on_overflow = False)
-            if self.__get_rms(data) > detection_threshold:
+            data = self.__stream.read(4096, exception_on_overflow = False)
+            rms = self.__get_rms(data)
+            if  rms > detection_threshold:
                 self._fct_on_detection()
             
