@@ -3,6 +3,8 @@ import contextlib
 import subprocess
 from pathlib import Path
 import re
+import json
+import os
 
 def get_logitech_720p_mic_id() -> int:
     p = pyaudio.PyAudio()
@@ -37,3 +39,28 @@ def get_logitech_4k_video_path() -> Path:
 
 def test_detector():
     print("bip")
+
+def save_in_config(key: str, value):
+    if not os.path.isfile('config.json'):
+        with open('config.json', 'w+') as file:
+            file.write("{}")
+    with open('config.json', 'r+') as file:
+        data = json.load(file)
+        data[key] = value
+        file.seek(0)
+        json.dump(data, file, indent=4)
+        file.truncate()
+
+def load_config():
+    if os.path.isfile('config.json'):
+        with open('config.json', 'r') as file:
+            data = json.load(file)
+            return data
+    else:
+        return None
+
+def get_in_config(key: str, default_value):
+    config = load_config()
+    if config is None or key not in config:
+        return default_value
+    return config[key]

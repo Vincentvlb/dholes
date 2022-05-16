@@ -4,6 +4,7 @@ import struct
 import math
 from typing import Callable
 from multiprocessing import Value
+from utility import save_in_config
 
 class Detector():
 
@@ -62,7 +63,9 @@ class AudioDetector(Detector):
         super().start_detection()
 
     def set_threshold(self, detection_threshold: float):
-        self.__detection_threshold.value = float(detection_threshold)
+        if float(detection_threshold) != self.__detection_threshold.value:
+            self.__detection_threshold.value = float(detection_threshold)
+            save_in_config('detection_threshold', float(detection_threshold))
         return self.get_formatted_threshold()
 
     def get_formatted_threshold(self):

@@ -2,6 +2,7 @@ from pathlib import Path
 import subprocess
 from datetime import datetime
 from multiprocessing import Value
+from utility import save_in_config
 
 class Recorder():
 
@@ -13,7 +14,9 @@ class Recorder():
         self._file_extension: str = file_extension
 
     def set_recording_time(self, second_recording_time: int) -> int:
-        self._second_recording_time.value = int(second_recording_time)
+        if int(second_recording_time) != self._second_recording_time.value:
+            self._second_recording_time.value = int(second_recording_time)
+            save_in_config('recording_time', int(second_recording_time))
         return self._second_recording_time.value
 
     def get_recording_time(self) -> int:
