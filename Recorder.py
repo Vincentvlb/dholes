@@ -2,7 +2,7 @@ from pathlib import Path
 import subprocess
 from datetime import datetime
 from multiprocessing import Value
-from utility import save_in_config
+from utility import save_in_config, led_on, led_off
 
 class Recorder():
 
@@ -57,5 +57,7 @@ class VideoAudioRecorder(Recorder):
         self.__height = height
         self.__sound_source = sound_source
 
-    def run_record(self) -> bool:   
+    def run_record(self) -> bool:
+        led_on("Green")   
         subprocess.run(f"ffmpeg -f v4l2 -r {self.__framerate} -s {self.__width}x{self.__height} -i {self._source} -f alsa -i {self.__sound_source} -ac 2 -map 0:v -map 1:a -preset ultrafast -crf 14 -t {self.get_recording_time()} -y {self._directory}/{self._get_formatted_filename()}.{self._file_extension}", shell=True, check=True)
+        led_off("Green")

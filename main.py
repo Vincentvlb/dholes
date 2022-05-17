@@ -5,6 +5,7 @@ from pathlib import Path
 import utility
 
 def main():
+    utility.add_service()
     record_path = Path("./videos")
     detection_threshold = utility.get_in_config("detection_threshold", 95)
     recording_time = utility.get_in_config("recording_time", 30)
@@ -18,4 +19,5 @@ def main():
     server.run_server("0.0.0.0", 80)
 
 if __name__ == '__main__':
+    utility.setup_led()
     main()
